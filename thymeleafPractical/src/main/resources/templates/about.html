@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8" />
+	<title>Document</title>
+</head>
+<body>
+	<h1>About Learn Code with Prince</h1>
+	<h2>Name of the Owner is</h2>
+	<h1 th:text="${name}"></h1>
+	<h2 th:text="${currentDate}"></h2>
+	<h2 th:text= "${ #strings.toUpperCase(name)}"></h2>
+	
+	<div th:with="a=5,b=67, n=${name}">
+	<h1>value of a is <span th:text="${a}"></span></h1>
+	<h1 th:text="'Value of b is '+${b}"></h1>
+	
+	<h2 th:text="'Sum of '+${a}+ 'and' +${b}+'is '+${a+b}"> </h2>
+	</div>
+	
+	
+	
+	
+ 
+</body>
+</html>
