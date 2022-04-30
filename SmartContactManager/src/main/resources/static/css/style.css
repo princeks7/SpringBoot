@@ -89,3 +89,12 @@ body {
 	cursor: pointer;
 	
 }
+
+.show_contact_img{
+	
+	width: 30px;
+	height:35px;
+	object-fit:cover;
+	border-radius: 50%;
+}
+
