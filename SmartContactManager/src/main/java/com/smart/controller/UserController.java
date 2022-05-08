@@ -6,9 +6,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
-import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpSession;
+import javax.websocket.Session;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
 import com.smart.dao.ContactRepository;
 import com.smart.dao.UserRepository;
 import com.smart.entities.Contact;
@@ -149,5 +151,51 @@ public class UserController {
 		m.addAttribute("currentPage", page);
 		m.addAttribute("totalPages", contacts.getTotalPages());
 		return "normal/show_contacts";
+	}
+	
+	//showing particular conatact details
+	@RequestMapping("/{cId}/contact")
+	public String showContactDetail(@PathVariable("cId") Integer cId,Model model, Principal principal)
+	{
+		System.out.println(cId);
+		
+		Optional<Contact> optional = this.contactRepository.findById(cId);
+		Contact contact = optional.get();
+		
+		//
+		
+		String userName = principal.getName();
+		User user = this.userRepository.getUserByUserName(userName);
+		
+		if(user.getId()==contact.getUser().getId())
+		   model.addAttribute("contact", contact);
+		
+		
+		return "normal/contact_details";
+	}
+
+	//Delete contact handler
+	
+	@GetMapping("/delete/{cid}")
+	public String deleteContact(@PathVariable("cid") Integer cId, Model model,Principal principal,HttpSession session  )
+	{
+		Optional<Contact> contactOptional = this.contactRepository.findById(cId);
+		Contact contact = contactOptional.get();
+		//check
+		
+		
+		String userName = principal.getName();
+		User user = this.userRepository.getUserByUserName(userName);
+		
+		if(user.getId()==contact.getUser().getId())
+		{   contact.setUser(null);
+			this.contactRepository.delete(contact);
+		}
+		
+		session.setAttribute("message", new Message("Contact deleted successfully...", "success"));
+		
+		
+		
+		return "redirect:/user/show-contacts/0";
 	}
 }

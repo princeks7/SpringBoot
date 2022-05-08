@@ -134,6 +134,37 @@
 	<!-- jQuery  -->
 	<script
 		src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+		
+		
+	<!-- CDN for delete alert -->
+	<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+	
+	<script>
+	
+	function deleteContact(cid)
+	{
+		swal({
+			  title: "Are you sure?",
+			  text: "You want to delete this contact",
+			  icon: "warning",
+			  buttons: true,
+			  dangerMode: true,
+			})
+			.then((willDelete) => {
+			  if (willDelete) {
+				  
+				  window.location="/user/delete/"+cid;
+			    
+			  } else {
+			    swal("You contact is not delete.");
+			  }
+			});
+		
+		
+	}
+	
+	
+	</script>
 
 </body>
 </html>
