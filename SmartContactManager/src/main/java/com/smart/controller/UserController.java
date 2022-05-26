@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -197,5 +198,75 @@ public class UserController {
 		
 		
 		return "redirect:/user/show-contacts/0";
+	}
+	
+	
+	// Open update form handler
+	
+	@PostMapping("/update-contact/{cid}")
+	public String updateForm(@PathVariable("cid") Integer cid,Model m)
+	{
+		
+		m.addAttribute("title", "Update Contact");
+		
+		 Contact contact = this.contactRepository.findById(cid).get();
+		 m.addAttribute("contact", contact);
+		
+		return "normal/update_form";
+	}
+	
+// update contact handle
+	@RequestMapping(value = "/process-update", method = RequestMethod.POST)
+	public String updateHandler(@ModelAttribute Contact contact,@RequestParam("profileImage") MultipartFile file,Model m,HttpSession session,Principal principal) {
+		//System.out.println("Contact Name"+contact.getName);
+		
+		
+		
+		
+		try {
+			Contact oldContactDetails = this.contactRepository.findById(contact.getcId()).get();
+			
+			if(!file.isEmpty())
+			{
+				// file work rewrite
+              //delete old photo
+				File deleteFile = new ClassPathResource("static/img").getFile();
+				File file1 = new File(deleteFile, oldContactDetails.getImage());
+				file1.delete();
+				//update new photo
+				File saveFile = new ClassPathResource("static/img").getFile();
+				Path path = Paths.get(saveFile.getAbsolutePath()+File.separator+file.getOriginalFilename());
+				Files.copy(file.getInputStream(), path ,StandardCopyOption.REPLACE_EXISTING);
+				
+			    contact.setImage(file.getOriginalFilename());
+								
+			}
+			else {
+				contact.setImage(oldContactDetails.getImage());
+			}
+			
+			User user = this.userRepository.getUserByUserName(principal.getName());
+			
+			contact.setUser(user);
+			this.contactRepository.save(contact);
+			
+			session.setAttribute("message", new Message("Your contact is updated...","success"));
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			
+		}
+		
+		return"redirect:/user/"+contact.getcId()+"/contact";
+	}
+	
+	// your profile handler
+	@GetMapping("/profile")
+	public String yourProfile(Model model)
+	{
+		model.addAttribute("title","Profile Page");
+		return "normal/profile";
+		
 	}
 }
